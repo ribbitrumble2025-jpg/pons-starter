@@ -1,25 +1,24 @@
-<!-- trenchytools:header -->
 <p align="center"><img src="./.github/social.png" alt="pons starter" width="100%"></p>
 
-<p align="center"><a href="https://pons.trenchy.tools"><b>Live demo</b></a> · <a href="https://trenchy.tools/docs">Docs</a> · <a href="https://api.trenchy.tools/api/create-api-key">Get an API key</a> · <a href="https://api.trenchy.tools/AGENTS.md">AGENTS.md</a> · <a href="https://api.trenchy.tools/openapi.json">OpenAPI</a> · <a href="https://trenchy.tools/status">Status</a> · <a href="https://t.me/trenchytools">Telegram</a> · <a href="https://x.com/trenchytoolz">X</a></p>
+<p align="center"><a href=""><b>Live demo</b></a> · <a href="/docs">Docs</a> · <a href="/api/create-api-key">Get an API key</a> · <a href="/AGENTS.md">AGENTS.md</a> · <a href="/openapi.json">OpenAPI</a> · <a href="/status">Status</a> · <a href="https://t.me/">Telegram</a> · <a href="https://x.com/trenchytoolz">X</a></p>
 
 # pons starter
 
 The official starter for launching on **pons** (Robinhood Chain, chain id 4663, native ETH) with the
-[TrenchyTools API](https://api.trenchy.tools/AGENTS.md). One Next.js app, one process, one `npm run dev`.
+[ API](/AGENTS.md). One Next.js app, one process, one `npm run dev`.
 A sibling of the pump.fun starter: same theme, same wallet folder, EVM instead of Solana.
 
 ## What it is
 
 - **Wallets**: one list, each wallet a file on your Desktop. **+ New wallet** (× N) or **Import ▾** a 0x key; the first
-  one becomes ★, the main wallet that pays for everything and receives gathers (click ☆ to move it). Click a label to
-  rename. Per row **Fund** (from ★) and **Key**; tick rows for **Amount each · Fund from ★ · Fund via exchange ▾ · Gather
-  to ★ · Export keys · Archive**. Results are toasts; API errors are shown verbatim.
+ one becomes ★, the main wallet that pays for everything and receives gathers (click ☆ to move it). Click a label to
+ rename. Per row **Fund** (from ★) and **Key**; tick rows for **Amount each · Fund from ★ · Fund via exchange ▾ · Gather
+ to ★ · Export keys · Archive**. Results are toasts; API errors are shown verbatim.
 - **Launch**: name, symbol, image, socials, the dev wallet (★ unless changed) and **Pick buyers**: tick wallets, give each
-  an ETH amount (pills, split evenly, `+ create N new`); snipers and holders under Advanced. A funding plan, a simulation,
-  then the launch with a live log of every hash.
+ an ETH amount (pills, split evenly, `+ create N new`); snipers and holders under Advanced. A funding plan, a simulation,
+ then the launch with a live log of every hash.
 - **Trading**: every wallet in a row with **[amount] Buy** and **25 / 50 / 100 %** sell buttons that act at once; tick rows
-  to buy or sell across the selection or add a timed sell; the coin's trades live on the right.
+ to buy or sell across the selection or add a timed sell; the coin's trades live on the right.
 
 The app holds your keys and signs locally with [viem](https://viem.sh). It never talks to an RPC node or IPFS: the API
 builds every transaction (`POST /api/rh/trade-local`), tells the signer what the chain knows (`GET /api/rh/account`),
@@ -32,7 +31,7 @@ a local, single-user tool.
 cd demos/pons-starter
 npm install
 cp .env.example .env
-curl "https://api.trenchy.tools/api/create-api-key?label=pons-starter"   # → { "apiKey": "…" }, shown once
+curl "/api/create-api-key?label=pons-starter" # → { "apiKey": "…" }, shown once
 # paste the key into .env as TRENCHY_API_KEY (or later in the app's Settings sheet)
 npm run dev
 ```
@@ -45,11 +44,11 @@ two more wallets, tick them and **Fund from ★**. Start with tiny sizes (0.001 
 
 Every wallet is a JSON file in one folder:
 
-| Setting                     | Folder                                                        |
+| Setting | Folder |
 | --------------------------- | ------------------------------------------------------------- |
-| `WALLET_BACKUP_DIR` set     | that folder                                                   |
-| otherwise, Desktop exists   | `~/Desktop/trenchytools-wallets`                              |
-| otherwise                   | `~/trenchytools-wallets`                                      |
+| `WALLET_BACKUP_DIR` set | that folder |
+| otherwise, Desktop exists | `~/Desktop/-wallets` |
+| otherwise | `~/-wallets` |
 
 Files are named `<date>-rh-<role>-<0xaddress>.json` and hold
 `{ publicKey, privateKey, chain: "rh", role, label, createdAt, app, note }`; every wallet is also one line in
@@ -68,17 +67,17 @@ Back the folder up like you would a seed phrase: anyone with a file controls tha
 pons is an EVM launchpad with a bonding curve that graduates to a Uniswap v4 pool. Three things differ from Solana:
 
 1. **Signing needs chain data.** Before signing, the app reads `GET /api/rh/account?wallet=0x…` for `chainId`,
-   `pendingNonce`, `maxFeePerGas` and `maxPriorityFeePerGas`, takes the nonce once per wallet per batch and adds 1 per
-   transaction. Every API answer is an ordered list of `{ label, to, data, value, gas }`; each one is signed with
-   `account.signTransaction`, sent with `POST /api/rh/send { transaction }` and confirmed with `GET /api/rh/tx/:hash`.
-   An `approve` is confirmed before the transaction after it goes out.
+ `pendingNonce`, `maxFeePerGas` and `maxPriorityFeePerGas`, takes the nonce once per wallet per batch and adds 1 per
+ transaction. Every API answer is an ordered list of `{ label, to, data, value, gas }`; each one is signed with
+ `account.signTransaction`, sent with `POST /api/rh/send { transaction }` and confirmed with `GET /api/rh/tx/:hash`.
+ An `approve` is confirmed before the transaction after it goes out.
 2. **No bundles, no Jito, no lookup tables.** The chain has a sequencer and no public mempool. "Bundle" here means: the
-   create goes out, and the moment `GET /api/rh/tx/:hash` says `success`, every bundle wallet's buy is sent at once,
-   each with its own nonce. Snipers follow staggered by `sniperGapMs`; holders are spread over `holderWindowS` with
-   jitter after `holderDelayS` (Settings).
+ create goes out, and the moment `GET /api/rh/tx/:hash` says `success`, every bundle wallet's buy is sent at once,
+ each with its own nonce. Snipers follow staggered by `sniperGapMs`; holders are spread over `holderWindowS` with
+ jitter after `holderDelayS` (Settings).
 3. **Snipe tax.** pons taxes buys in the launch window unless the wallet is on the creator's exempt list. The create
-   call carries `tokenMetadata` and `exemptWallets` (up to 31); the app puts every bundle, sniper and holder wallet on
-   that list and warns when there are more than 31.
+ call carries `tokenMetadata` and `exemptWallets` (up to 31); the app puts every bundle, sniper and holder wallet on
+ that list and warns when there are more than 31.
 
 The launch itself: image → `POST /api/ipfs` → `metadata.image`; `POST /api/rh/trade-local { wallet: dev, action:
 "create", tokenMetadata, amount, exemptWallets, slippage }` → `transactions[]` (create + fee) and `predicted.token`;
@@ -110,7 +109,7 @@ endpoint, so there is no claim row.
 ## The one file to copy
 
 [`lib/trenchy.ts`](lib/trenchy.ts) is the whole API client: one documented method per endpoint, `ApiError` with
-`status · code · hint · docs`, and `sendAll()` (account read → nonce run → send in order → confirm). It depends only on
+`status · code · hint · docs`, and `sendAll` (account read → nonce run → send in order → confirm). It depends only on
 viem, takes the key in its constructor and runs in Node and in the browser alike; drop it into your own project with
 [`lib/core/evm.ts`](lib/core/evm.ts) (the signer) and [`lib/core/errors.ts`](lib/core/errors.ts) and you have everything this app
 uses. [`lib/wallets.ts`](lib/wallets.ts) is the folder store with the backup rule.
@@ -119,9 +118,9 @@ Every error the API returns is shown exactly as returned: message, `code`, `hint
 
 ## Build it with AI
 
-Paste this into your coding agent together with `https://api.trenchy.tools/AGENTS.md`:
+Paste this into your coding agent together with `/AGENTS.md`:
 
-> Build a pons (Robinhood Chain) launch tool on the TrenchyTools API. Read `https://api.trenchy.tools/AGENTS.md`
+> Build a pons (Robinhood Chain) launch tool on the API. Read `/AGENTS.md`
 > and `openapi.json` first; use only endpoints that exist there. Keys stay local: `trade-local` returns unsigned EVM
 > transactions, sign them with viem using `GET /api/rh/account` for chainId, nonce and fees, send with
 > `POST /api/rh/send`, confirm with `GET /api/rh/tx/:hash`, in order; confirm an `approve` before the next one. Write
@@ -148,23 +147,23 @@ The public demo (`pons.trenchy.tools`) is this same app built in **demo mode**, 
 holding their keys:
 
 ```bash
-NEXT_PUBLIC_DEMO=1 npm run build              # build-time flag: the pages talk to the in-browser engine
-DEMO_MODE=1 node .next/standalone/server.js   # runtime flag: every /api/* route answers 404 { code: "demo_mode" }
+NEXT_PUBLIC_DEMO=1 npm run build # build-time flag: the pages talk to the in-browser engine
+DEMO_MODE=1 node .next/standalone/server.js # runtime flag: every /api/* route answers 404 { code: "demo_mode" }
 ```
 
 What differs from local mode (which is unchanged without the flags):
 
 - **Keys live in the visitor's browser** (`localStorage`, one entry per wallet, same shape as a wallet file). Signing happens in
-  the tab with viem: `GET /api/rh/account` (pendingNonce, fees, chainId) → `account.signTransaction` per transaction, nonce + 1
-  per transaction of a run → `POST /api/rh/send` → `GET /api/rh/tx/:hash`. The server keeps no state and serves no wallet route
-  ([`proxy.ts`](proxy.ts) → `demoGuard` in `lib/http.ts`).
+ the tab with viem: `GET /api/rh/account` (pendingNonce, fees, chainId) → `account.signTransaction` per transaction, nonce + 1
+ per transaction of a run → `POST /api/rh/send` → `GET /api/rh/tx/:hash`. The server keeps no state and serves no wallet route
+ ([`proxy.ts`](proxy.ts) → `demoGuard` in `lib/http.ts`).
 - **Backup first:** a new wallet is *not backed up* and cannot be funded, launched with, traded or gathered (`409 not_backed_up`)
-  until **Download backup** (top bar or Wallets page) has saved its key: one JSON file per click, with the CSV text inside it.
-  **Export all keys** downloads everything any time. Clearing the site's data deletes the keys.
+ until **Download backup** (top bar or Wallets page) has saved its key: one JSON file per click, with the CSV text inside it.
+ **Export all keys** downloads everything any time. Clearing the site's data deletes the keys.
 - **Each visitor gets their own API key**, created in the browser on the first visit (`GET /api/create-api-key?label=demo-pons`)
-  and kept in `localStorage`. Settings shows it masked, takes a pasted key, and shows the API's refusal verbatim when creation is
-  rate-limited. Every API call (and the live-trades websocket `wss://api.trenchy.tools/api/rh/data`) goes straight from the
-  browser to `https://api.trenchy.tools`.
+ and kept in `localStorage`. Settings shows it masked, takes a pasted key, and shows the API's refusal verbatim when creation is
+ rate-limited. Every API call (and the live-trades websocket `wss://api.trenchy.tools/api/rh/data`) goes straight from the
+ browser to ``.
 - **Launches and timed sells run in the tab**: keep it open. Timed sells are kept in `localStorage` and resume on reload.
 - A strict Content-Security-Policy is sent (`next.config.ts`): scripts from this origin only, network to this origin and the API only.
 
